@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wehikuł Rynku — Marzec 2020: Przetrwaj krach</title>
+  <meta name="description" content="Edukacyjna symulacja inwestowania na danych historycznych. Wirtualne 10 000 zł, prawdziwe ceny ropy z marca 2020 r. XP za proces, nie za zysk.">
+  <meta name="theme-color" content="#0b0f1a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23ffb547'/%3E%3Cpath d='M7 20l5-6 4 4 4-7 5 5' fill='none' stroke='%231b1303' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Chart.js: przypięta wersja 4.5.0 z hashem SRI (zob. CLAUDE.md) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"
+          integrity="sha512-Y51n9mtKTVBh3Jbx5pZSJNDDMyY+yGe77DGtBPzRlgsf/YLCh13kSZ3JmfHGzYFCmOndraf0sQgfM654b7dJ3w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <p class="disclaimer" role="note">
+    Symulacja edukacyjna. To nie jest porada inwestycyjna. Wszystkie środki są wirtualne.
+  </p>
+
+  <header class="app-header">
+    <div class="container header-inner">
+      <p class="brand">
+        <svg class="brand-logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="9" fill="currentColor"/>
+          <path d="M7 20l5-6 4 4 4-7 5 5" fill="none" stroke="#1b1303" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Wehikuł Rynku</span>
+      </p>
+      <div class="challenge-meta">
+        <p class="eyebrow">Wyzwanie historyczne</p>
+        <h1 id="challenge-title">Marzec 2020: Przetrwaj krach</h1>
+      </div>
+      <p class="capital-pill">Kapitał wirtualny: <strong>10 000 zł</strong></p>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <p id="load-error" class="notice notice-danger" role="alert" hidden></p>
+
+    <!-- EKRAN 1: plan przed startem -->
+    <section id="screen-intro" class="screen" aria-labelledby="intro-title" hidden>
+      <div class="intro-grid">
+        <article class="card hero-card">
+          <p class="eyebrow">22 sesje · dane z marca 2020 r.</p>
+          <h2 id="intro-title" class="hero-title" tabindex="-1">Masz 10 000 zł wirtualnych. Przetrwaj krach i nie strać więcej niż 10%.</h2>
+          <p id="intro-text" class="lead"></p>
+          <ul class="rule-list">
+            <li><span class="rule-icon" aria-hidden="true">⛔</span>
+              <span><strong>Limit straty:</strong> portfel nie może spaść poniżej 9 000 zł. Przekroczenie kończy wyzwanie.</span></li>
+            <li><span class="rule-icon" aria-hidden="true">📅</span>
+              <span><strong>Dzień po dniu:</strong> widzisz tylko sesje do „dziś”. Przyszłych cen nie zobaczysz.</span></li>
+            <li><span class="rule-icon" aria-hidden="true">⏱</span>
+              <span><strong>Wykonanie zleceń:</strong> zlecenie złożone dziś wykona się po cenie z następnej sesji.</span></li>
+            <li><span class="rule-icon" aria-hidden="true">⭐</span>
+              <span><strong>XP za proces, nie za zysk:</strong> punktujemy plan, stop loss, wielkość pozycji i dyscyplinę.</span></li>
+          </ul>
+          <p class="asset-note" id="asset-note"></p>
+        </article>
+
+        <form id="plan-form" class="card plan-card" novalidate aria-labelledby="plan-title">
+          <h2 id="plan-title">Twój plan ryzyka</h2>
+          <p class="muted">Zdecyduj przed startem. Na końcu sprawdzimy, czy trzymałeś się planu.</p>
+
+          <fieldset class="choice-group" aria-describedby="error-maxPositionPercent">
+            <legend>1. Maksymalna wielkość pozycji w ropie</legend>
+            <div class="choices choices-4">
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="10"><span class="choice-body"><span class="choice-title">10%</span><span class="choice-sub">do 1 000 zł</span></span></label>
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="25"><span class="choice-body"><span class="choice-title">25%</span><span class="choice-sub">do 2 500 zł</span></span></label>
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="50"><span class="choice-body"><span class="choice-title">50%</span><span class="choice-sub">do 5 000 zł</span></span></label>
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="100"><span class="choice-body"><span class="choice-title">100%</span><span class="choice-sub">bez limitu</span></span></label>
+            </div>
+            <p class="field-error" id="error-maxPositionPercent" hidden></p>
+          </fieldset>
+
+          <fieldset class="choice-group" aria-describedby="stop-help error-stopLossPercent">
+            <legend>2. Stop loss (poziom wyjścia z pozycji)</legend>
+            <p class="hint" id="stop-help">Sprzedaj całą pozycję, gdy cena spadnie o tyle procent poniżej średniej ceny zakupu.</p>
+            <div class="choices choices-4">
+              <label class="choice"><input type="radio" name="stopLossPercent" value="5"><span class="choice-body"><span class="choice-title">5%</span><span class="choice-sub">ciasny</span></span></label>
+              <label class="choice"><input type="radio" name="stopLossPercent" value="8"><span class="choice-body"><span class="choice-title">8%</span><span class="choice-sub">średni</span></span></label>
+              <label class="choice"><input type="radio" name="stopLossPercent" value="12"><span class="choice-body"><span class="choice-title">12%</span><span class="choice-sub">luźny</span></span></label>
+              <label class="choice"><input type="radio" name="stopLossPercent" value="none"><span class="choice-body"><span class="choice-title">Brak</span><span class="choice-sub">bez stop loss</span></span></label>
+            </div>
+            <p class="field-error" id="error-stopLossPercent" hidden></p>
+          </fieldset>
+
+          <fieldset class="choice-group" aria-describedby="error-quizAnswer">
+            <legend id="quiz-legend">3. Pytanie o dywersyfikację</legend>
+            <div class="choices choices-1" id="quiz-options"></div>
+            <p class="field-error" id="error-quizAnswer" hidden></p>
+          </fieldset>
+
+          <details class="rules-details">
+            <summary>Jak liczymy XP (reguły gry)</summary>
+            <p class="hint">Progi punktowe to reguły tej gry edukacyjnej, a nie uniwersalne zalecenia inwestycyjne. Zysk nie daje XP.</p>
+            <div id="xp-rules"></div>
+          </details>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="start-button">Rozpocznij wyzwanie</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- EKRAN 2: symulacja -->
+    <section id="screen-game" class="screen" aria-labelledby="game-title" hidden>
+      <h2 id="game-title" class="sr-only" tabindex="-1">Symulacja</h2>
+      <p id="session-announcer" class="sr-only" aria-live="polite"></p>
+
+      <div class="game-layout">
+        <div class="game-main">
+          <div class="stats">
+            <article class="stat stat-hero">
+              <h3 class="stat-label">Wartość portfela</h3>
+              <p class="stat-value" id="portfolio-value">10 000,00 zł</p>
+              <p class="stat-delta" id="portfolio-profit">0,00 zł</p>
+            </article>
+            <article class="stat">
+              <h3 class="stat-label">Bieżąca sesja</h3>
+              <p class="stat-value-sm" id="session-date">—</p>
+              <p class="stat-sub" id="session-progress-text">—</p>
+              <div class="progress" id="session-progress" role="progressbar" aria-label="Postęp wyzwania" aria-valuemin="0" aria-valuemax="22" aria-valuenow="0">
+                <span class="progress-fill" id="session-progress-fill"></span>
+              </div>
+            </article>
+            <article class="stat">
+              <h3 class="stat-label">Gotówka</h3>
+              <p class="stat-value-sm" id="cash-value">—</p>
+              <h3 class="stat-label stat-label-gap">Ropa WTI</h3>
+              <p class="stat-sub" id="position-value">—</p>
+            </article>
+            <article class="stat stat-limit">
+              <h3 class="stat-label">Zapas do limitu straty</h3>
+              <p class="stat-value-sm" id="limit-margin">—</p>
+              <div class="meter" aria-hidden="true"><span class="meter-fill" id="limit-fill"></span></div>
+              <p class="stat-sub">Limit: portfel ≥ 9 000 zł</p>
+            </article>
+          </div>
+
+          <article class="card chart-card" aria-labelledby="chart-title">
+            <div class="chart-head">
+              <div>
+                <h3 id="chart-title" class="card-title">Ropa WTI · cena symulacyjna</h3>
+                <p class="price-now"><span id="price-now">—</span> <span class="price-change" id="price-change"></span></p>
+              </div>
+              <ul class="legend" aria-label="Legenda wykresu">
+                <li><span class="swatch swatch-price" aria-hidden="true"></span>Cena</li>
+                <li><span class="swatch swatch-stop" aria-hidden="true"></span>Stop loss</li>
+                <li><span class="swatch swatch-buy" aria-hidden="true">▲</span>Kupno</li>
+                <li><span class="swatch swatch-sell" aria-hidden="true">▼</span>Sprzedaż</li>
+              </ul>
+            </div>
+            <div class="chart-box">
+              <canvas id="price-chart" role="img" aria-label="Wykres ceny"></canvas>
+            </div>
+            <p id="chart-fallback" class="notice notice-warn" hidden>
+              Nie udało się wczytać biblioteki wykresu. Te same dane znajdziesz w tabeli poniżej.
+            </p>
+            <details class="table-details">
+              <summary>Dane wykresu w tabeli</summary>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <caption class="sr-only">Odsłonięte sesje i ceny symulacyjne</caption>
+                  <thead><tr><th scope="col">Data</th><th scope="col">Cena</th><th scope="col">Zmiana</th></tr></thead>
+                  <tbody id="price-table"></tbody>
+                </table>
+              </div>
+            </details>
+            <p class="source-note" id="source-note"></p>
+          </article>
+        </div>
+
+        <div class="game-side">
+          <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+          <form id="order-form" class="card order-card" novalidate aria-labelledby="order-title">
+            <h3 id="order-title" class="card-title">Zlecenie</h3>
+            <fieldset class="segmented">
+              <legend class="sr-only">Rodzaj zlecenia</legend>
+              <label class="segment segment-buy"><input type="radio" name="side" value="buy" checked><span>Kup</span></label>
+              <label class="segment segment-sell"><input type="radio" name="side" value="sell"><span>Sprzedaj</span></label>
+            </fieldset>
+
+            <label class="field-label" for="order-input" id="order-label">Kwota zakupu</label>
+            <div class="input-wrap">
+              <input id="order-input" name="quantity" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="order-hint order-error">
+              <span class="input-suffix" id="order-suffix" aria-hidden="true">zł</span>
+            </div>
+            <div class="chips" id="order-chips" role="group" aria-label="Szybki wybór wielkości zlecenia"></div>
+            <p class="hint" id="order-hint"></p>
+            <p class="field-error" id="order-error" hidden></p>
+            <button type="submit" class="btn btn-buy btn-block" id="order-submit">Kup</button>
+
+            <div class="pending" id="pending" hidden>
+              <p id="pending-text"></p>
+              <button type="button" class="btn btn-ghost btn-sm" id="cancel-order">Anuluj zlecenie</button>
+            </div>
+            <p class="hint">Zlecenie wykona się po cenie z <strong>następnej</strong> sesji — w chwili decyzji jej nie znasz.</p>
+          </form>
+
+          <div class="card stop-card">
+            <label class="field-label" for="stop-select">Stop loss</label>
+            <select id="stop-select" aria-describedby="stop-info stop-warning">
+              <option value="none">Bez stop loss</option>
+              <option value="5">5% poniżej średniej ceny zakupu</option>
+              <option value="8">8% poniżej średniej ceny zakupu</option>
+              <option value="12">12% poniżej średniej ceny zakupu</option>
+            </select>
+            <p class="hint" id="stop-info"></p>
+            <p class="hint" id="stop-warning">Stop loss sprawdzamy na cenie z końca dnia. Przy gwałtownym spadku sprzedaż nastąpi niżej niż ustawiony poziom — to nie jest gwarancja ograniczenia straty.</p>
+          </div>
+
+          <div class="next-bar">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="next-session">Następna sesja →</button>
+          </div>
+
+          <article class="card xp-card" aria-labelledby="xp-card-title">
+            <div class="xp-card-head">
+              <h3 id="xp-card-title" class="card-title">XP</h3>
+              <span class="xp-badge">do 100 XP</span>
+            </div>
+            <p class="hint">XP przyznamy po zakończeniu — za proces, nie za zysk. Liczymy z Twoich decyzji z dziennika.</p>
+            <p class="plan-summary" id="plan-summary"></p>
+          </article>
+
+          <article class="card journal-card" aria-labelledby="journal-title">
+            <h3 id="journal-title" class="card-title">Dziennik decyzji</h3>
+            <ol class="journal" id="journal"></ol>
+          </article>
+
+          <button type="button" class="btn btn-ghost btn-block" id="reset-button">Zresetuj wyzwanie</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EKRAN 3: wynik -->
+    <section id="screen-results" class="screen" aria-labelledby="results-title" hidden>
+      <article class="card result-hero" id="result-hero">
+        <p class="eyebrow" id="result-eyebrow">Wyzwanie zakończone</p>
+        <h2 id="results-title" class="hero-title" tabindex="-1">Wynik</h2>
+        <p class="lead" id="result-summary"></p>
+        <div class="result-stats">
+          <div class="result-stat">
+            <h3 class="stat-label">Końcowa wartość portfela</h3>
+            <p class="stat-value" id="result-value">—</p>
+          </div>
+          <div class="result-stat">
+            <h3 class="stat-label">Wynik względem 10 000 zł</h3>
+            <p class="stat-value-sm" id="result-profit">—</p>
+          </div>
+          <div class="result-stat">
+            <h3 class="stat-label">Limit straty 10%</h3>
+            <p class="stat-value-sm" id="result-limit">—</p>
+          </div>
+        </div>
+        <p class="hint">Wynik finansowy nie wpływa na XP. Ten sam proces z innym zyskiem daje tyle samo punktów.</p>
+      </article>
+
+      <div class="results-grid">
+        <article class="card xp-result" aria-labelledby="xp-result-title">
+          <h3 id="xp-result-title" class="card-title">Zdobyte XP</h3>
+          <div class="xp-ring" id="xp-ring" style="--progress: 0">
+            <p class="xp-ring-inner"><span class="xp-total" id="xp-total">0</span><span class="xp-max">/ 100 XP</span></p>
+          </div>
+          <p class="hint">Za proces: kontrolę straty, stop loss, wielkość pozycji, rozumienie dywersyfikacji i dyscyplinę.</p>
+        </article>
+
+        <article class="card feedback feedback-good" aria-labelledby="good-title">
+          <h3 id="good-title" class="card-title">Co zrobiłeś dobrze</h3>
+          <ul class="feedback-list" id="strengths"></ul>
+        </article>
+
+        <article class="card feedback feedback-bad" aria-labelledby="bad-title">
+          <h3 id="bad-title" class="card-title">Co poprawić</h3>
+          <ul class="feedback-list" id="improvements"></ul>
+        </article>
+      </div>
+
+      <article class="card" aria-labelledby="categories-title">
+        <h3 id="categories-title" class="card-title">XP w kategoriach</h3>
+        <p class="hint">Progi punktowe to reguły tej gry edukacyjnej, a nie uniwersalne zalecenia inwestycyjne.</p>
+        <div class="categories" id="categories"></div>
+      </article>
+
+      <details class="card journal-details">
+        <summary>Pełny dziennik decyzji</summary>
+        <ol class="journal" id="results-journal"></ol>
+      </details>
+
+      <div class="results-actions">
+        <button type="button" class="btn btn-primary btn-lg" id="replay-button">Zagraj ponownie</button>
+      </div>
+
+      <div class="results-grid results-grid-2">
+        <!-- Formularz jest domyślnie ukryty; main.js pokazuje go tylko przy CONFIG.signupEnabled = true. -->
+        <section class="card signup-card" id="signup-section" aria-labelledby="signup-title" hidden>
+          <h2 id="signup-title" class="card-title-lg">Chcesz kolejne wyzwanie?</h2>
+          <p class="muted">Zostaw e-mail, a damy znać, gdy pojawi się następne wyzwanie historyczne.</p>
+          <form id="signup-form" novalidate>
+            <label class="field-label" for="signup-email">Adres e-mail</label>
+            <input id="signup-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" aria-describedby="signup-email-error">
+            <p class="field-error" id="signup-email-error" hidden></p>
+
+            <div class="hp-field" aria-hidden="true">
+              <label for="signup-website">Zostaw to pole puste</label>
+              <input id="signup-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="checkbox-row">
+              <input id="signup-consent" name="consent" type="checkbox" aria-describedby="signup-consent-error">
+              <label for="signup-consent">Mam co najmniej 16 lat i zgadzam się na otrzymywanie e-maili o nowych wyzwaniach i materiałach edukacyjnych, w tym o płatnym kursie, gdy powstanie. Zgodę mogę w każdej chwili wycofać.</label>
+            </div>
+            <p class="field-error" id="signup-consent-error" hidden></p>
+
+            <p class="privacy-note">Adres wykorzystamy tylko do wysyłki tych wiadomości. Najpierw dostaniesz e-mail z linkiem potwierdzającym — bez kliknięcia nie dopiszemy Cię do listy. Szczegóły: <a href="privacy.html">polityka prywatności</a>.</p>
+            <button type="submit" class="btn btn-secondary btn-block" id="signup-submit">Zapisz mnie</button>
+            <p class="form-status" id="signup-status" role="status" aria-live="polite" hidden></p>
+          </form>
+        </section>
+
+        <section class="card course-card" aria-labelledby="course-title">
+          <p class="eyebrow">W przygotowaniu</p>
+          <h2 id="course-title" class="card-title-lg">Chcesz uczyć się dalej?</h2>
+          <p class="muted">Planujemy pełny kurs z kolejnymi wyzwaniami historycznymi i omówieniem decyzji.</p>
+          <button type="button" class="btn btn-accent btn-block" id="course-button">Pełny kurs – 19 zł</button>
+          <p class="hint">Kurs nie jest jeszcze dostępny. Kliknięcie nie uruchamia żadnej płatności.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>Wehikuł Rynku</strong> — projekt edukacyjny. Nie zawiera rekomendacji ani linków do brokerów. <a href="privacy.html">Prywatność</a></p>
+      <p id="data-attribution"></p>
+      <p id="analytics-note"></p>
+      <div id="analytics-debug" class="analytics-debug" hidden>
+        <p><strong>Podgląd analityki (tryb testowy)</strong> — zdarzenia zarejestrowane w tej karcie, nic nie jest wysyłane:</p>
+        <ol id="analytics-debug-list"></ol>
+      </div>
+      <p class="copyright">© 2026 Karski-B. Wszelkie prawa zastrzeżone. Kod nie jest objęty licencją open source.</p>
+    </div>
+  </footer>
+
+  <dialog id="course-dialog" class="dialog" aria-labelledby="course-dialog-title" aria-describedby="course-dialog-text">
+    <div class="dialog-icon" aria-hidden="true">🎓</div>
+    <h2 id="course-dialog-title" class="card-title-lg">Pełny kurs</h2>
+    <p id="course-dialog-text">Pełny kurs nie jest jeszcze gotowy. Nie pobieramy płatności. Dziękujemy za zainteresowanie.</p>
+    <form method="dialog">
+      <button type="submit" class="btn btn-primary btn-block" autofocus>Zamknij</button>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "id": "march-2020",
+  "title": "Marzec 2020: Przetrwaj krach",
+  "goal": "Masz 10 000 zł wirtualnych. Przetrwaj krach i nie strać więcej niż 10% kapitału początkowego.",
+  "intro": "Jest 28 lutego 2020 r. Na świecie rozprzestrzenia się COVID-19, a w ostatnim tygodniu cena ropy wyraźnie spadła. Nie wiesz, co będzie dalej — widzisz tylko dane do dziś.",
+  "rules": {
+    "initialCapital": 10000,
+    "currency": "PLN",
+    "currencyNote": "Wszystkie kwoty w grze to wirtualne złote. Nie są to prawdziwe pieniądze.",
+    "maxLossPercent": 10,
+    "minPortfolioValue": 9000
+  },
+  "timeline": {
+    "historyStart": "2020-02-03",
+    "startDate": "2020-02-28",
+    "endDate": "2020-03-31",
+    "note": "Sesje do startDate włącznie są widoczne od początku. Sesje po startDate odsłaniane są pojedynczo w trakcie wyzwania.",
+    "missingWeekdays": [
+      {
+        "date": "2020-02-17",
+        "reason": "Brak notowania w źródle EIA (dzień wolny na rynku USA)."
+      }
+    ]
+  },
+  "calendar": [
+    "2020-02-03",
+    "2020-02-04",
+    "2020-02-05",
+    "2020-02-06",
+    "2020-02-07",
+    "2020-02-10",
+    "2020-02-11",
+    "2020-02-12",
+    "2020-02-13",
+    "2020-02-14",
+    "2020-02-18",
+    "2020-02-19",
+    "2020-02-20",
+    "2020-02-21",
+    "2020-02-24",
+    "2020-02-25",
+    "2020-02-26",
+    "2020-02-27",
+    "2020-02-28",
+    "2020-03-02",
+    "2020-03-03",
+    "2020-03-04",
+    "2020-03-05",
+    "2020-03-06",
+    "2020-03-09",
+    "2020-03-10",
+    "2020-03-11",
+    "2020-03-12",
+    "2020-03-13",
+    "2020-03-16",
+    "2020-03-17",
+    "2020-03-18",
+    "2020-03-19",
+    "2020-03-20",
+    "2020-03-23",
+    "2020-03-24",
+    "2020-03-25",
+    "2020-03-26",
+    "2020-03-27",
+    "2020-03-30",
+    "2020-03-31"
+  ],
+  "assets": [
+    {
+      "id": "wti",
+      "name": "Ropa naftowa WTI (cena spot, Cushing, Oklahoma)",
+      "shortName": "Ropa WTI",
+      "type": "surowiec",
+      "sourceId": "eia-rwtc",
+      "sourceSeries": "RWTC - Cushing, OK WTI Spot Price FOB (Dollars per Barrel)",
+      "sourceCurrency": "USD",
+      "sourceUnit": "USD za baryłkę (cena zamknięcia spot z danego dnia)",
+      "priceUnit": "zł symulacyjne za 1 jednostkę",
+      "priceIsSimulated": true,
+      "conversion": {
+        "method": "Cena symulacyjna zachowuje historyczne zmiany procentowe ceny w USD. Nie jest rzeczywistą ceną transakcyjną.",
+        "formula": "price = close / 44.83 * 100",
+        "baseDate": "2020-02-28",
+        "baseClose": 44.83,
+        "basePrice": 100.0,
+        "rounding": "price zaokrąglone do 4 miejsc po przecinku",
+        "fxIncluded": false,
+        "fxNote": "Przeliczenie nie uwzględnia kursu USD/PLN ani kosztów transakcyjnych. Polski inwestor miałby dodatkowo zysk lub stratę na walucie."
+      },
+      "sessions": [
+        {
+          "date": "2020-02-03",
+          "close": 50.06,
+          "price": 111.6663
+        },
+        {
+          "date": "2020-02-04",
+          "close": 49.59,
+          "price": 110.6179
+        },
+        {
+          "date": "2020-02-05",
+          "close": 50.87,
+          "price": 113.4731
+        },
+        {
+          "date": "2020-02-06",
+          "close": 50.94,
+          "price": 113.6293
+        },
+        {
+          "date": "2020-02-07",
+          "close": 50.34,
+          "price": 112.2909
+        },
+        {
+          "date": "2020-02-10",
+          "close": 49.59,
+          "price": 110.6179
+        },
+        {
+          "date": "2020-02-11",
+          "close": 50.0,
+          "price": 111.5325
+        },
+        {
+          "date": "2020-02-12",
+          "close": 51.13,
+          "price": 114.0531
+        },
+        {
+          "date": "2020-02-13",
+          "close": 51.41,
+          "price": 114.6777
+        },
+        {
+          "date": "2020-02-14",
+          "close": 52.03,
+          "price": 116.0607
+        },
+        {
+          "date": "2020-02-18",
+          "close": 52.1,
+          "price": 116.2168
+        },
+        {
+          "date": "2020-02-19",
+          "close": 53.31,
+          "price": 118.9159
+        },
+        {
+          "date": "2020-02-20",
+          "close": 53.77,
+          "price": 119.942
+        },
+        {
+          "date": "2020-02-21",
+          "close": 53.36,
+          "price": 119.0274
+        },
+        {
+          "date": "2020-02-24",
+          "close": 51.36,
+          "price": 114.5661
+        },
+        {
+          "date": "2020-02-25",
+          "close": 49.78,
+          "price": 111.0417
+        },
+        {
+          "date": "2020-02-26",
+          "close": 48.67,
+          "price": 108.5657
+        },
+        {
+          "date": "2020-02-27",
+          "close": 47.17,
+          "price": 105.2197
+        },
+        {
+          "date": "2020-02-28",
+          "close": 44.83,
+          "price": 100.0
+        },
+        {
+          "date": "2020-03-02",
+          "close": 46.78,
+          "price": 104.3498
+        },
+        {
+          "date": "2020-03-03",
+          "close": 47.27,
+          "price": 105.4428
+        },
+        {
+          "date": "2020-03-04",
+          "close": 46.78,
+          "price": 104.3498
+        },
+        {
+          "date": "2020-03-05",
+          "close": 45.9,
+          "price": 102.3868
+        },
+        {
+          "date": "2020-03-06",
+          "close": 41.14,
+          "price": 91.7689
+        },
+        {
+          "date": "2020-03-09",
+          "close": 31.05,
+          "price": 69.2617
+        },
+        {
+          "date": "2020-03-10",
+          "close": 34.47,
+          "price": 76.8905
+        },
+        {
+          "date": "2020-03-11",
+          "close": 33.13,
+          "price": 73.9014
+        },
+        {
+          "date": "2020-03-12",
+          "close": 31.56,
+          "price": 70.3993
+        },
+        {
+          "date": "2020-03-13",
+          "close": 31.72,
+          "price": 70.7562
+        },
+        {
+          "date": "2020-03-16",
+          "close": 28.96,
+          "price": 64.5996
+        },
+        {
+          "date": "2020-03-17",
+          "close": 26.96,
+          "price": 60.1383
+        },
+        {
+          "date": "2020-03-18",
+          "close": 20.48,
+          "price": 45.6837
+        },
+        {
+          "date": "2020-03-19",
+          "close": 25.09,
+          "price": 55.967
+        },
+        {
+          "date": "2020-03-20",
+          "close": 19.48,
+          "price": 43.453
+        },
+        {
+          "date": "2020-03-23",
+          "close": 23.33,
+          "price": 52.041
+        },
+        {
+          "date": "2020-03-24",
+          "close": 21.03,
+          "price": 46.9106
+        },
+        {
+          "date": "2020-03-25",
+          "close": 20.75,
+          "price": 46.286
+        },
+        {
+          "date": "2020-03-26",
+          "close": 16.6,
+          "price": 37.0288
+        },
+        {
+          "date": "2020-03-27",
+          "close": 15.48,
+          "price": 34.5304
+        },
+        {
+          "date": "2020-03-30",
+          "close": 14.1,
+          "price": 31.4522
+        },
+        {
+          "date": "2020-03-31",
+          "close": 20.51,
+          "price": 45.7506
+        }
+      ]
+    }
+  ],
+  "diversification": {
+    "multiAssetAvailable": false,
+    "note": "W tym wyzwaniu jest tylko jedno aktywo (ropa WTI) oraz gotówka. Aplikacja nie symuluje dywersyfikacji między aktywami. Format danych pozwala dodać kolejne aktywo w tablicy assets (z sesjami zgodnymi z tablicą calendar)."
+  },
+  "sources": [
+    {
+      "id": "eia-rwtc",
+      "publisher": "U.S. Energy Information Administration (EIA)",
+      "originalDataProvider": "Refinitiv, an LSEG business (wg strony Definitions, Sources and Explanatory Notes EIA)",
+      "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RWTC&f=D",
+      "termsUrl": "https://www.eia.gov/about/copyrights_reuse.php",
+      "license": "Domena publiczna (publikacja rządu USA) - wg strony Copyrights and Reuse EIA",
+      "attribution": "Źródło: U.S. Energy Information Administration (Oct 2026)",
+      "sourceReleaseDate": "2026-10-15",
+      "retrievedOn": "2026-10-18",
+      "details": "DATA_SOURCE.md"
+    }
+  ]
+}

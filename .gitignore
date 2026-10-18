@@ -1,0 +1,9 @@
+# Sekrety — nigdy do repozytorium
+.env
+.env.*
+!.env.example
+
+# Pliki systemowe i narzędzi
+.DS_Store
+.vercel
+__pycache__/

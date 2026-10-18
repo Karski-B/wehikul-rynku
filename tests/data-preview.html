@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Podgląd danych wyzwania</title>
+  <!-- Strona techniczna dla autora projektu: sprawdza, czy JSON wczytuje się bez błędów. -->
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.5; max-width: 52rem; margin: 0 auto; padding: 1rem; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    th, td { border: 1px solid #bbb; padding: 0.25rem 0.5rem; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    .ok { color: #0a6b2d; font-weight: 700; }
+    .error { color: #b00020; font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Podgląd danych wyzwania</h1>
+    <p id="status" role="status">Wczytywanie…</p>
+    <div id="output"></div>
+  </main>
+
+  <script type="module">
+    import { loadChallenge, getStartIndex } from '../js/data.js';
+    import { formatDate, formatNumber } from '../js/format.js';
+
+    const status = document.querySelector('#status');
+    const output = document.querySelector('#output');
+
+    function row(session) {
+      return `<tr><td>${formatDate(session.date)} (${session.date})</td>
+        <td>${formatNumber(session.close)} USD</td><td>${formatNumber(session.price, 4)} zł</td></tr>`;
+    }
+
+    function table(caption, sessions) {
+      return `<h2>${caption}</h2><div class="table-wrap"><table>
+        <thead><tr><th>Data sesji</th><th>Cena źródłowa (close)</th><th>Cena symulacyjna (price)</th></tr></thead>
+        <tbody>${sessions.map(row).join('')}</tbody></table></div>`;
+    }
+
+    try {
+      const challenge = await loadChallenge();
+      const asset = challenge.assets[0];
+      const sessions = asset.sessions;
+      const startIndex = getStartIndex(challenge);
+      const example = sessions.find((s) => s.date === '2020-03-30');
+
+      status.innerHTML = '<span class="ok">Dane wczytane poprawnie.</span>';
+      output.innerHTML = `
+        <ul>
+          <li>Wyzwanie: <strong>${challenge.title}</strong></li>
+          <li>Kapitał: ${challenge.rules.initialCapital} zł (wirtualne), limit straty: ${challenge.rules.maxLossPercent}%</li>
+          <li>Instrument: ${asset.name}</li>
+          <li>Wszystkich sesji: ${sessions.length}; widocznych na starcie: ${startIndex + 1};
+              sesji wyzwania: ${sessions.length - startIndex - 1}</li>
+          <li>Przeliczenie: <code>${asset.conversion.formula}</code> — ${asset.conversion.method}</li>
+          <li>Przykład: ${formatDate(example.date)} → ${formatNumber(example.close)} USD → ${formatNumber(example.price, 4)} zł symulacyjnych</li>
+          <li>${challenge.sources[0].attribution}</li>
+        </ul>
+        ${table('Pierwsze 5 sesji', sessions.slice(0, 5))}
+        ${table('Ostatnie 5 sesji', sessions.slice(-5))}`;
+    } catch (error) {
+      status.innerHTML = `<span class="error">Błąd: ${error.message}</span>`;
+    }
+  </script>
+</body>
+</html>
