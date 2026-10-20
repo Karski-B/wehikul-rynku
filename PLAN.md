@@ -3,7 +3,7 @@
 Zasady obowiązujące w każdym kroku są w [CLAUDE.md](CLAUDE.md).
 Legenda: ✅ zrobione · ⚠️ zrobione z zastrzeżeniem · ⬜ do zrobienia · 🔒 punkt kontrolny
 
-Stan na 18.10.2026: **MVP działa lokalnie i przechodzi testy (31/31). Hosting: GitHub Pages.**
+Stan na 18.10.2026: **MVP działa lokalnie i przechodzi testy (49/49). Hosting: GitHub Pages.**
 Przed publikacją trzeba uzupełnić politykę prywatności — zob. [DEPLOY.md](DEPLOY.md).
 
 ## Etapy
@@ -18,6 +18,10 @@ Przed publikacją trzeba uzupełnić politykę prywatności — zob. [DEPLOY.md]
 | 5. Zapis e-mail 🔒B | formularz, `api/subscribe.js` (Brevo, double opt-in), `PRIVACY.md`, `privacy.html` | ⏸ wyłączony (`signupEnabled: false`) — GitHub Pages nie uruchamia funkcji serwerowych; kod i testy zostają na później |
 | 6. Analityka i kurs 🔒C | adapter (tryb testowy / Umami), 3 zdarzenia, przycisk kursu z oknem bez płatności | ⚠️ działa w trybie testowym; wymaga konta Umami |
 | 7. Kontrola jakości i publikacja 🔒D | audyt, README, DEPLOY, `.nojekyll`, wersja pod GitHub Pages | ⚠️ gotowe technicznie; czeka na uzupełnienie polityki prywatności |
+| 8. Rozbudowa (18.10.2026) | dane do 10.2026, wybór długości i przedłużanie, przewijanie, cena ujemna 20.04.2020, wiadomości z rynku, statystyki, porównanie strategii, słowniczek, tryb „Losowy rynek” | ✅ testy 43/43, sprawdzone przy 360–1440 px; nie wysłane jeszcze na GitHub |
+| 9. Studio — kontynuacja (19.10.2026) | 3 niezależne oceny (UX/gra, QA wizualne i dostępność, krytyk) + krytyka kierunku; pulpit czasu, „Zakończ grę”, uszczelnienie XP (próg 5% pozycji, oddalanie stopu przez wyłączenie), XP na pierwszym planie wyniku, uczciwe porównanie kup-i-trzymaj, poprawki WCAG (✓ na kartach, ramki pól 3,9:1, cele 44 px, regiony przewijane, scroll-padding) | ✅ testy 49/49; sprawdzone 320–1440 px i w poziomie; nie wysłane na GitHub |
+| 10. Podniesienie jakości (19.10.2026) | „Dlaczego?” przy każdym zleceniu, sprawdzane z faktami (ostrzeżenie w formularzu); kontrola straty oceniana w chwili zakupu (pozycja ≤ zapas do limitu) zamiast wyniku — ten sam proces = to samo XP; wykrywanie uśredniania w dół; pytanie refleksyjne po grze (bez XP); oś czasu z decyzjami; tożsamość wizualna (krój z systemu, płaskie powierzchnie, ikony SVG, logo); krótsza pętla gry na telefonie (skróty wykres ↔ zlecenie); neutralne formy językowe; 16 wiadomości z rynku do 2025 r.; wskaźnik ładowania (CLS 0,68 → 0); test ścieżki gracza `tests/ui.html`; axe-core 0 naruszeń w 8 stanach; 320–1440 px i tekst 200% bez przewijania w poziomie | ✅ testy 59/59 i 14/14; nie wysłane na GitHub |
+| 11. Analiza studia i poprawki (19.10.2026) | Recenzja 4 niezależnych specjalistów + karta jakości (82,5/100). Pakiet XP: wszystkie kryteria liczone po cenie z chwili decyzji, „kontrola straty” = strata do stopu ≤ zapas (plan 25% nie kłóci się już z XP), uśrednianie w dół oceniane przy decyzji. Pakiet dostępności i tekstów: fokus zostaje na szybkiej kwocie, okno potwierdzenia w stronie zamiast `confirm`, komunikaty ogłaszane po pokazaniu ekranu, `role="alert"` przy błędzie zlecenia, osobny region ostrzeżeń, zapas przewijania z mierzonej wysokości paska i pulpitu, strzałki ▸ w zwijanych sekcjach, pełna tabela danych z kolumną transakcji, wniosek z refleksji przechodzi do następnej gry, odmiana, „stop lossu”, kwoty jak w Intl, opisy 20.04.2020 i 23.06.2025, prawdziwy opis danych Umami, 3 nowe hasła w słowniczku. Naprawiona regresja: zapis z ujemną gotówką. | ✅ testy 63/63 i 16/16, axe 0 w 8 stanach, 14 konfiguracji szerokości; nie wysłane na GitHub |
 
 ## Reguła wykonania zleceń (ważne dla przyszłych zmian)
 

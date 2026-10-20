@@ -22,6 +22,25 @@ export function saveState(state) {
   }
 }
 
+// Wniosek z refleksji („Co zrobisz inaczej?”) przechodzi do następnej gry w tej samej karcie.
+const LESSON_KEY = 'wehikul-rynku:lesson';
+
+export function loadLesson() {
+  try {
+    return window.sessionStorage.getItem(LESSON_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function saveLesson(choiceId) {
+  try {
+    window.sessionStorage.setItem(LESSON_KEY, choiceId);
+  } catch {
+    // Bez zapisu wniosek po prostu nie przejdzie do następnej gry.
+  }
+}
+
 export function clearState() {
   try {
     window.sessionStorage.removeItem(KEY);

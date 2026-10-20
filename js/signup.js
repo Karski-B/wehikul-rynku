@@ -12,9 +12,9 @@ const SERVER_MESSAGES = {
   not_configured: ['is-info', 'Zapis jest wyłączony w tym środowisku: serwer nie ma skonfigurowanej listy mailingowej. Twój adres nie został nigdzie zapisany.'],
   invalid_email: ['is-error', 'Serwer uznał adres e-mail za niepoprawny. Sprawdź pisownię i spróbuj ponownie.'],
   consent_required: ['is-error', 'Bez zaznaczonej zgody nie możemy Cię zapisać.'],
-  forbidden_origin: ['is-error', 'Formularz został wysłany z nieobsługiwanej strony. Nie zostałeś zapisany.'],
-  provider_error: ['is-error', 'System mailingowy odrzucił zgłoszenie. Nie zostałeś zapisany. Spróbuj ponownie później.'],
-  provider_unreachable: ['is-error', 'Nie udało się połączyć z systemem mailingowym. Nie zostałeś zapisany. Spróbuj ponownie później.'],
+  forbidden_origin: ['is-error', 'Formularz został wysłany z nieobsługiwanej strony. Adres nie został zapisany.'],
+  provider_error: ['is-error', 'System mailingowy odrzucił zgłoszenie. Adres nie został zapisany. Spróbuj ponownie później.'],
+  provider_unreachable: ['is-error', 'Nie udało się połączyć z systemem mailingowym. Adres nie został zapisany. Spróbuj ponownie później.'],
 };
 
 function setFieldError(input, errorElement, message) {
@@ -83,7 +83,7 @@ export function initSignupForm(form) {
           form.reset();
           return;
         }
-        showStatus(status, 'is-error', 'Serwer odpowiedział w nieoczekiwany sposób. Nie zostałeś zapisany.');
+        showStatus(status, 'is-error', 'Serwer odpowiedział w nieoczekiwany sposób. Adres nie został zapisany.');
         return;
       }
       if ([404, 405, 501].includes(response.status)) {
@@ -92,10 +92,10 @@ export function initSignupForm(form) {
         return;
       }
       const code = await readServerError(response);
-      const [type, message] = SERVER_MESSAGES[code] ?? ['is-error', 'Coś poszło nie tak. Nie zostałeś zapisany. Spróbuj ponownie później.'];
+      const [type, message] = SERVER_MESSAGES[code] ?? ['is-error', 'Coś poszło nie tak. Adres nie został zapisany. Spróbuj ponownie później.'];
       showStatus(status, type, message);
     } catch {
-      showStatus(status, 'is-error', 'Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie. Nie zostałeś zapisany.');
+      showStatus(status, 'is-error', 'Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie. Adres nie został zapisany.');
     } finally {
       sending = false;
       submit.disabled = false;

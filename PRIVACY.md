@@ -51,7 +51,7 @@ Administratorem danych osobowych jest **[DO UZUPEŁNIENIA: imię i nazwisko lub 
 **Gra nie wysyła danych.** Stan rozgrywki zapisuje się tylko w pamięci karty przeglądarki
 (sessionStorage) i znika po jej zamknięciu.
 
-Statystyki nie używają cookies i nie zawierają identyfikatora użytkownika. Liczymy zdarzenia,
+Statystyki nie używają cookies. Skrypt Umami dołącza jednak dane techniczne (adres i tytuł strony, referrer, rozdzielczość ekranu, język), a serwer Umami widzi adres IP — dlatego nie piszemy „bez danych osobowych”. Liczymy zdarzenia,
 a nie osoby.
 
 ### 3. Odbiorcy danych

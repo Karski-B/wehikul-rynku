@@ -1,8 +1,10 @@
 // Adapter analityki. Reszta aplikacji woła tylko track('nazwa_zdarzenia').
 //
 // ZASADY POMIARU
-// - Wysyłamy wyłącznie trzy nazwy zdarzeń, bez żadnych dodatkowych danych:
+// - Sami wysyłamy wyłącznie trzy nazwy zdarzeń, bez żadnych dodatkowych danych:
 //   challenge_started, challenge_completed, course_cta_clicked.
+// - Uwaga: skrypt Umami sam dołącza dane techniczne (adres i tytuł strony, referrer, ekran, język),
+//   a serwer Umami widzi adres IP. Opisujemy to w privacy.html — nie piszemy „bez danych osobowych”.
 // - Nie wysyłamy e-maili, treści formularzy, identyfikatorów ani odcisku przeglądarki.
 // - Umami liczy zdarzenia, a nie osoby. Liczby to „rozpoczęcia”, „ukończenia” i „kliknięcia”.
 // - Bez skonfigurowanego Umami działa tryb testowy: zdarzenie trafia tylko do konsoli

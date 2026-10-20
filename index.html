@@ -6,7 +6,7 @@
   <title>Wehikuł Rynku — Marzec 2020: Przetrwaj krach</title>
   <meta name="description" content="Edukacyjna symulacja inwestowania na danych historycznych. Wirtualne 10 000 zł, prawdziwe ceny ropy z marca 2020 r. XP za proces, nie za zysk.">
   <meta name="theme-color" content="#0b0f1a">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23ffb547'/%3E%3Cpath d='M7 20l5-6 4 4 4-7 5 5' fill='none' stroke='%231b1303' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23ffb547'/%3E%3Cg fill='none' stroke='%231b1303' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.2 11.2A8.6 8.6 0 1 1 8.4 20'/%3E%3Cpath d='M5.8 9.6l3.4 1.6 1.6-3.4'/%3E%3Cpath d='M11.5 19l3-3.6 2.6 1.8 3.6-5'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
   <!-- Chart.js: przypięta wersja 4.5.0 z hashem SRI (zob. CLAUDE.md) -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"
@@ -17,21 +17,23 @@
 <body>
   <a class="skip-link" href="#main">Przejdź do treści</a>
 
-  <p class="disclaimer" role="note">
-    Symulacja edukacyjna. To nie jest porada inwestycyjna. Wszystkie środki są wirtualne.
-  </p>
+  <aside class="disclaimer" aria-label="Informacja edukacyjna">
+    <p>Symulacja edukacyjna. To nie jest porada inwestycyjna. Wszystkie środki są wirtualne.</p>
+  </aside>
 
   <header class="app-header">
     <div class="container header-inner">
       <p class="brand">
         <svg class="brand-logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
           <rect width="32" height="32" rx="9" fill="currentColor"/>
-          <path d="M7 20l5-6 4 4 4-7 5 5" fill="none" stroke="#1b1303" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.2 11.2A8.6 8.6 0 1 1 8.4 20" fill="none" stroke="#1b1303" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M5.8 9.6l3.4 1.6 1.6-3.4" fill="none" stroke="#1b1303" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.5 19l3-3.6 2.6 1.8 3.6-5" fill="none" stroke="#1b1303" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span>Wehikuł Rynku</span>
       </p>
       <div class="challenge-meta">
-        <p class="eyebrow">Wyzwanie historyczne</p>
+        <p class="eyebrow" id="header-eyebrow">Wyzwanie historyczne</p>
         <h1 id="challenge-title">Marzec 2020: Przetrwaj krach</h1>
       </div>
       <p class="capital-pill">Kapitał wirtualny: <strong>10 000 zł</strong></p>
@@ -39,38 +41,54 @@
   </header>
 
   <main id="main" class="container">
+    <p id="loading" class="loading" role="status">Wczytywanie danych wyzwania…</p>
+    <noscript><p class="notice notice-danger">Ta aplikacja potrzebuje włączonego JavaScriptu.</p></noscript>
     <p id="load-error" class="notice notice-danger" role="alert" hidden></p>
 
     <!-- EKRAN 1: plan przed startem -->
     <section id="screen-intro" class="screen" aria-labelledby="intro-title" hidden>
       <div class="intro-grid">
         <article class="card hero-card">
-          <p class="eyebrow">22 sesje · dane z marca 2020 r.</p>
+          <p class="eyebrow" id="intro-eyebrow"></p>
           <h2 id="intro-title" class="hero-title" tabindex="-1">Masz 10 000 zł wirtualnych. Przetrwaj krach i nie strać więcej niż 10%.</h2>
           <p id="intro-text" class="lead"></p>
           <ul class="rule-list">
-            <li><span class="rule-icon" aria-hidden="true">⛔</span>
-              <span><strong>Limit straty:</strong> portfel nie może spaść poniżej 9 000 zł. Przekroczenie kończy wyzwanie.</span></li>
-            <li><span class="rule-icon" aria-hidden="true">📅</span>
+            <li><span class="rule-icon"><svg class="rule-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 5l5 5 3-3 5 5"/><path d="M3 19h18" stroke-dasharray="2.5 2.5"/><path d="M16 12h3v-3"/></svg></span>
+              <span><strong>Limit straty:</strong> portfel nie może spaść poniżej 9000 zł. Przekroczenie kończy wyzwanie.</span></li>
+            <li><span class="rule-icon"><svg class="rule-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
               <span><strong>Dzień po dniu:</strong> widzisz tylko sesje do „dziś”. Przyszłych cen nie zobaczysz.</span></li>
-            <li><span class="rule-icon" aria-hidden="true">⏱</span>
+            <li><span class="rule-icon"><svg class="rule-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg></span>
               <span><strong>Wykonanie zleceń:</strong> zlecenie złożone dziś wykona się po cenie z następnej sesji.</span></li>
-            <li><span class="rule-icon" aria-hidden="true">⭐</span>
-              <span><strong>XP za proces, nie za zysk:</strong> punktujemy plan, stop loss, wielkość pozycji i dyscyplinę.</span></li>
+            <li><span class="rule-icon"><svg class="rule-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7l2 2 4-4M4 16l2 2 4-4M13.5 8h7M13.5 17h7"/></svg></span>
+              <span><strong>XP za proces, nie za zysk:</strong> punktujemy plan, stop loss, wielkość pozycji, dyscyplinę i uzasadnienie decyzji.</span></li>
           </ul>
-          <p class="asset-note" id="asset-note"></p>
+          <details class="asset-details">
+            <summary>Skąd są ceny? (cena symulacyjna)</summary>
+            <p class="asset-note" id="asset-note"></p>
+          </details>
         </article>
 
         <form id="plan-form" class="card plan-card" novalidate aria-labelledby="plan-title">
           <h2 id="plan-title">Twój plan ryzyka</h2>
-          <p class="muted">Zdecyduj przed startem. Na końcu sprawdzimy, czy trzymałeś się planu.</p>
+          <p class="muted">Zdecyduj przed startem. Na końcu sprawdzimy, czy plan został dotrzymany.</p>
+          <p class="lesson-note" id="lesson-note" hidden></p>
+
+          <fieldset class="choice-group" aria-describedby="market-help">
+            <legend>Rynek</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="mode" value="history" checked><span class="choice-body"><span class="choice-title">Historia: 2020</span><span class="choice-sub">prawdziwe ceny ropy WTI</span></span></label>
+              <label class="choice"><input type="radio" name="mode" value="random"><span class="choice-body"><span class="choice-title">Losowy rynek</span><span class="choice-sub">nowe ceny w każdej grze</span></span></label>
+            </div>
+            <p class="hint market-help" id="market-help" aria-live="polite"></p>
+            <button type="button" class="btn btn-ghost btn-sm" id="reroll-button" hidden>Losuj nowe ceny</button>
+          </fieldset>
 
           <fieldset class="choice-group" aria-describedby="error-maxPositionPercent">
-            <legend>1. Maksymalna wielkość pozycji w ropie</legend>
+            <legend>1. Maksymalna wielkość pozycji</legend>
             <div class="choices choices-4">
-              <label class="choice"><input type="radio" name="maxPositionPercent" value="10"><span class="choice-body"><span class="choice-title">10%</span><span class="choice-sub">do 1 000 zł</span></span></label>
-              <label class="choice"><input type="radio" name="maxPositionPercent" value="25"><span class="choice-body"><span class="choice-title">25%</span><span class="choice-sub">do 2 500 zł</span></span></label>
-              <label class="choice"><input type="radio" name="maxPositionPercent" value="50"><span class="choice-body"><span class="choice-title">50%</span><span class="choice-sub">do 5 000 zł</span></span></label>
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="10"><span class="choice-body"><span class="choice-title">10%</span><span class="choice-sub">do 1000 zł</span></span></label>
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="25"><span class="choice-body"><span class="choice-title">25%</span><span class="choice-sub">do 2500 zł</span></span></label>
+              <label class="choice"><input type="radio" name="maxPositionPercent" value="50"><span class="choice-body"><span class="choice-title">50%</span><span class="choice-sub">do 5000 zł</span></span></label>
               <label class="choice"><input type="radio" name="maxPositionPercent" value="100"><span class="choice-body"><span class="choice-title">100%</span><span class="choice-sub">bez limitu</span></span></label>
             </div>
             <p class="field-error" id="error-maxPositionPercent" hidden></p>
@@ -78,12 +96,12 @@
 
           <fieldset class="choice-group" aria-describedby="stop-help error-stopLossPercent">
             <legend>2. Stop loss (poziom wyjścia z pozycji)</legend>
-            <p class="hint" id="stop-help">Sprzedaj całą pozycję, gdy cena spadnie o tyle procent poniżej średniej ceny zakupu.</p>
+            <p class="hint" id="stop-help">Gra sprzeda całą pozycję, gdy cena spadnie o tyle procent poniżej średniej ceny zakupu.</p>
             <div class="choices choices-4">
               <label class="choice"><input type="radio" name="stopLossPercent" value="5"><span class="choice-body"><span class="choice-title">5%</span><span class="choice-sub">ciasny</span></span></label>
               <label class="choice"><input type="radio" name="stopLossPercent" value="8"><span class="choice-body"><span class="choice-title">8%</span><span class="choice-sub">średni</span></span></label>
               <label class="choice"><input type="radio" name="stopLossPercent" value="12"><span class="choice-body"><span class="choice-title">12%</span><span class="choice-sub">luźny</span></span></label>
-              <label class="choice"><input type="radio" name="stopLossPercent" value="none"><span class="choice-body"><span class="choice-title">Brak</span><span class="choice-sub">bez stop loss</span></span></label>
+              <label class="choice"><input type="radio" name="stopLossPercent" value="none"><span class="choice-body"><span class="choice-title">Brak</span><span class="choice-sub">bez stop lossu</span></span></label>
             </div>
             <p class="field-error" id="error-stopLossPercent" hidden></p>
           </fieldset>
@@ -92,6 +110,13 @@
             <legend id="quiz-legend">3. Pytanie o dywersyfikację</legend>
             <div class="choices choices-1" id="quiz-options"></div>
             <p class="field-error" id="error-quizAnswer" hidden></p>
+          </fieldset>
+
+          <fieldset class="choice-group" aria-describedby="horizon-help error-horizonId">
+            <legend>4. Długość wyzwania</legend>
+            <p class="hint" id="horizon-help">Po dojściu do końca możesz wyzwanie przedłużyć. Limit straty 10% obowiązuje przez cały czas.</p>
+            <div class="choices" id="horizon-options"></div>
+            <p class="field-error" id="error-horizonId" hidden></p>
           </fieldset>
 
           <details class="rules-details">
@@ -108,43 +133,58 @@
     <!-- EKRAN 2: symulacja -->
     <section id="screen-game" class="screen" aria-labelledby="game-title" hidden>
       <h2 id="game-title" class="sr-only" tabindex="-1">Symulacja</h2>
-      <p id="session-announcer" class="sr-only" aria-live="polite"></p>
 
       <div class="game-layout">
         <div class="game-main">
           <div class="stats">
             <article class="stat stat-hero">
-              <h3 class="stat-label">Wartość portfela</h3>
+              <p class="stat-label">Wartość portfela</p>
               <p class="stat-value" id="portfolio-value">10 000,00 zł</p>
               <p class="stat-delta" id="portfolio-profit">0,00 zł</p>
             </article>
-            <article class="stat">
-              <h3 class="stat-label">Bieżąca sesja</h3>
+            <article class="stat stat-session">
+              <p class="stat-label">Bieżąca sesja</p>
               <p class="stat-value-sm" id="session-date">—</p>
               <p class="stat-sub" id="session-progress-text">—</p>
-              <div class="progress" id="session-progress" role="progressbar" aria-label="Postęp wyzwania" aria-valuemin="0" aria-valuemax="22" aria-valuenow="0">
-                <span class="progress-fill" id="session-progress-fill"></span>
-              </div>
             </article>
             <article class="stat">
-              <h3 class="stat-label">Gotówka</h3>
+              <p class="stat-label">Gotówka</p>
               <p class="stat-value-sm" id="cash-value">—</p>
-              <h3 class="stat-label stat-label-gap">Ropa WTI</h3>
+              <p class="stat-label stat-label-gap" id="asset-label">Surowiec</p>
               <p class="stat-sub" id="position-value">—</p>
             </article>
             <article class="stat stat-limit">
-              <h3 class="stat-label">Zapas do limitu straty</h3>
+              <p class="stat-label">Zapas do limitu straty</p>
               <p class="stat-value-sm" id="limit-margin">—</p>
               <div class="meter" aria-hidden="true"><span class="meter-fill" id="limit-fill"></span></div>
-              <p class="stat-sub">Limit: portfel ≥ 9 000 zł</p>
+              <p class="stat-sub" id="limit-level">Limit: portfel ≥ 9000 zł</p>
             </article>
           </div>
+
+          <section class="timeline" aria-labelledby="timeline-title">
+            <div class="timeline-head">
+              <h3 id="timeline-title" class="card-title">Oś czasu</h3>
+              <ul class="timeline-legend" aria-label="Oznaczenia na osi">
+                <li><span class="tl-mark tl-news" aria-hidden="true"></span>wiadomość</li>
+                <li><span class="tl-mark tl-buy" aria-hidden="true"></span>kupno</li>
+                <li><span class="tl-mark tl-sell" aria-hidden="true"></span>sprzedaż</li>
+              </ul>
+            </div>
+            <div class="timeline-track" id="session-progress" role="progressbar" aria-label="Postęp wyzwania" aria-valuemin="0" aria-valuemax="22" aria-valuenow="0">
+              <span class="timeline-fill" id="session-progress-fill"></span>
+              <span class="timeline-ticks" id="timeline-ticks"></span>
+              <span class="timeline-marks" id="timeline-marks"></span>
+              <span class="timeline-now" id="timeline-now"></span>
+            </div>
+            <p class="timeline-ends"><span id="timeline-start"></span><span id="timeline-end"></span></p>
+          </section>
 
           <article class="card chart-card" aria-labelledby="chart-title">
             <div class="chart-head">
               <div>
-                <h3 id="chart-title" class="card-title">Ropa WTI · cena symulacyjna</h3>
+                <h3 id="chart-title" class="card-title">Cena</h3>
                 <p class="price-now"><span id="price-now">—</span> <span class="price-change" id="price-change"></span></p>
+                <p class="price-real" id="price-real" hidden></p>
               </div>
               <ul class="legend" aria-label="Legenda wykresu">
                 <li><span class="swatch swatch-price" aria-hidden="true"></span>Cena</li>
@@ -161,23 +201,42 @@
             </p>
             <details class="table-details">
               <summary>Dane wykresu w tabeli</summary>
-              <div class="table-wrap">
+              <div class="table-wrap" tabindex="0" role="region" aria-label="Tabela cen odsłoniętych sesji">
                 <table class="data-table">
-                  <caption class="sr-only">Odsłonięte sesje i ceny symulacyjne</caption>
-                  <thead><tr><th scope="col">Data</th><th scope="col">Cena</th><th scope="col">Zmiana</th></tr></thead>
+                  <caption class="table-caption" id="price-table-caption">Odsłonięte sesje</caption>
+                  <thead><tr><th scope="col">Data</th><th scope="col">Cena</th><th scope="col">Zmiana</th><th scope="col">Transakcja</th></tr></thead>
                   <tbody id="price-table"></tbody>
                 </table>
               </div>
             </details>
+            <a class="jump-link" href="#order-title">Przejdź do zlecenia ↓</a>
             <p class="source-note" id="source-note"></p>
           </article>
         </div>
 
         <div class="game-side">
-          <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+          <section class="dock" id="dock" aria-label="Pulpit czasu">
+            <div class="dock-status">
+              <p class="dock-cell dock-time"><span class="dock-label"><span id="dock-weekday"></span> · sesja <span id="dock-session"></span></span><span class="dock-big" id="dock-date"></span></p>
+              <p class="dock-cell"><span class="dock-label">Cena <span id="dock-change"></span></span><span class="dock-big" id="dock-price"></span></p>
+              <p class="dock-cell dock-cell-end"><span class="dock-label">Portfel</span><span class="dock-big" id="dock-value"></span></p>
+            </div>
+            <p class="dock-event" id="dock-event" role="status" aria-live="polite"></p>
+            <div class="next-row">
+              <button type="button" class="btn btn-primary btn-lg" id="next-session">Następna sesja →</button>
+              <button type="button" class="btn btn-ghost btn-ff" id="ff-week" aria-label="Przewiń o tydzień (5 sesji)" aria-describedby="ff-hint">+tydzień</button>
+              <button type="button" class="btn btn-ghost btn-ff" id="ff-month" aria-label="Przewiń o miesiąc (21 sesji)" aria-describedby="ff-hint">+miesiąc</button>
+            </div>
+            <p class="sr-only" id="ff-hint">Przewijanie zatrzyma się przy transakcji, stop lossie, dużym ruchu ceny przy otwartej pozycji, zbliżeniu do limitu straty, wiadomości z rynku albo na końcu wyzwania.</p>
+          </section>
+
+          <div id="notice" class="notice" hidden></div>
 
           <form id="order-form" class="card order-card" novalidate aria-labelledby="order-title">
-            <h3 id="order-title" class="card-title">Zlecenie</h3>
+            <div class="card-head">
+              <h3 id="order-title" class="card-title">Zlecenie</h3>
+              <a class="jump-link" href="#chart-title">↑ Wykres</a>
+            </div>
             <fieldset class="segmented">
               <legend class="sr-only">Rodzaj zlecenia</legend>
               <label class="segment segment-buy"><input type="radio" name="side" value="buy" checked><span>Kup</span></label>
@@ -186,12 +245,20 @@
 
             <label class="field-label" for="order-input" id="order-label">Kwota zakupu</label>
             <div class="input-wrap">
-              <input id="order-input" name="quantity" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="order-hint order-error">
+              <input id="order-input" name="quantity" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="order-error order-hint">
               <span class="input-suffix" id="order-suffix" aria-hidden="true">zł</span>
             </div>
             <div class="chips" id="order-chips" role="group" aria-label="Szybki wybór wielkości zlecenia"></div>
             <p class="hint" id="order-hint"></p>
-            <p class="field-error" id="order-error" hidden></p>
+            <p class="field-error" id="order-error" role="alert" hidden></p>
+
+            <fieldset class="reason-group" aria-describedby="reason-help reason-warning">
+              <legend>Dlaczego? <span class="legend-note">(liczy się do XP)</span></legend>
+              <div class="reason-options" id="reason-options"></div>
+              <p class="hint" id="reason-help"></p>
+              <p class="hint is-warning" id="reason-warning" aria-live="polite"></p>
+            </fieldset>
+
             <button type="submit" class="btn btn-buy btn-block" id="order-submit">Kup</button>
 
             <div class="pending" id="pending" hidden>
@@ -204,7 +271,7 @@
           <div class="card stop-card">
             <label class="field-label" for="stop-select">Stop loss</label>
             <select id="stop-select" aria-describedby="stop-info stop-warning">
-              <option value="none">Bez stop loss</option>
+              <option value="none">Bez stop lossu</option>
               <option value="5">5% poniżej średniej ceny zakupu</option>
               <option value="8">8% poniżej średniej ceny zakupu</option>
               <option value="12">12% poniżej średniej ceny zakupu</option>
@@ -213,9 +280,17 @@
             <p class="hint" id="stop-warning">Stop loss sprawdzamy na cenie z końca dnia. Przy gwałtownym spadku sprzedaż nastąpi niżej niż ustawiony poziom — to nie jest gwarancja ograniczenia straty.</p>
           </div>
 
-          <div class="next-bar">
-            <button type="button" class="btn btn-primary btn-lg btn-block" id="next-session">Następna sesja →</button>
-          </div>
+          <article class="card news-card" id="news-card" aria-labelledby="news-title" hidden>
+            <h3 id="news-title" class="card-title">Wiadomości z rynku</h3>
+            <ol class="news-list" id="news-list"></ol>
+            <p class="hint">Opisy wydarzeń: opracowanie własne na podstawie powszechnie znanych faktów. Widzisz tylko to, co już się wydarzyło.</p>
+          </article>
+
+          <article class="card" aria-labelledby="stats-title">
+            <h3 id="stats-title" class="card-title">Statystyki rozgrywki</h3>
+            <dl class="stats-list" id="stats-list"></dl>
+            <p class="hint">Statystyki pomagają ocenić ryzyko. Nie wpływają na XP.</p>
+          </article>
 
           <article class="card xp-card" aria-labelledby="xp-card-title">
             <div class="xp-card-head">
@@ -224,11 +299,14 @@
             </div>
             <p class="hint">XP przyznamy po zakończeniu — za proces, nie za zysk. Liczymy z Twoich decyzji z dziennika.</p>
             <p class="plan-summary" id="plan-summary"></p>
+            <button type="button" class="btn btn-secondary btn-block finish-button" id="finish-button">Zakończ grę i zobacz ocenę</button>
           </article>
 
           <article class="card journal-card" aria-labelledby="journal-title">
             <h3 id="journal-title" class="card-title">Dziennik decyzji</h3>
-            <ol class="journal" id="journal"></ol>
+            <div class="journal-scroll" tabindex="0" role="region" aria-label="Wpisy dziennika decyzji">
+              <ol class="journal" id="journal"></ol>
+            </div>
           </article>
 
           <button type="button" class="btn btn-ghost btn-block" id="reset-button">Zresetuj wyzwanie</button>
@@ -239,37 +317,46 @@
     <!-- EKRAN 3: wynik -->
     <section id="screen-results" class="screen" aria-labelledby="results-title" hidden>
       <article class="card result-hero" id="result-hero">
-        <p class="eyebrow" id="result-eyebrow">Wyzwanie zakończone</p>
-        <h2 id="results-title" class="hero-title" tabindex="-1">Wynik</h2>
-        <p class="lead" id="result-summary"></p>
+        <div class="result-head">
+          <div class="result-intro">
+            <p class="eyebrow" id="result-eyebrow">Wyzwanie zakończone</p>
+            <h2 id="results-title" class="hero-title" tabindex="-1">Wynik</h2>
+            <p class="lead" id="result-summary"></p>
+          </div>
+          <div class="xp-block">
+            <div class="xp-ring" id="xp-ring" style="--progress: 0">
+              <p class="xp-ring-inner"><span class="xp-total" id="xp-total">0</span><span class="xp-max">/ 100 XP</span></p>
+            </div>
+            <p class="hint">XP za proces: kontrolę straty, stop loss, wielkość pozycji, rozumienie dywersyfikacji i dyscyplinę (plan i uzasadnienie decyzji).</p>
+          </div>
+        </div>
         <div class="result-stats">
           <div class="result-stat">
-            <h3 class="stat-label">Końcowa wartość portfela</h3>
+            <p class="stat-label">Końcowa wartość portfela</p>
             <p class="stat-value" id="result-value">—</p>
           </div>
           <div class="result-stat">
-            <h3 class="stat-label">Wynik względem 10 000 zł</h3>
+            <p class="stat-label">Wynik względem 10 000 zł</p>
             <p class="stat-value-sm" id="result-profit">—</p>
           </div>
           <div class="result-stat">
-            <h3 class="stat-label">Limit straty 10%</h3>
+            <p class="stat-label">Limit straty 10%</p>
             <p class="stat-value-sm" id="result-limit">—</p>
           </div>
         </div>
         <p class="hint">Wynik finansowy nie wpływa na XP. Ten sam proces z innym zyskiem daje tyle samo punktów.</p>
       </article>
 
-      <div class="results-grid">
-        <article class="card xp-result" aria-labelledby="xp-result-title">
-          <h3 id="xp-result-title" class="card-title">Zdobyte XP</h3>
-          <div class="xp-ring" id="xp-ring" style="--progress: 0">
-            <p class="xp-ring-inner"><span class="xp-total" id="xp-total">0</span><span class="xp-max">/ 100 XP</span></p>
-          </div>
-          <p class="hint">Za proces: kontrolę straty, stop loss, wielkość pozycji, rozumienie dywersyfikacji i dyscyplinę.</p>
-        </article>
+      <article class="card extend-card" id="extend-card" aria-labelledby="extend-title" hidden>
+        <h3 id="extend-title" class="card-title">Graj dalej</h3>
+        <p class="muted">Przedłuż wyzwanie — portfel, plan i dziennik zostają bez zmian, a XP policzymy dla całej rozgrywki.</p>
+        <div class="extend-options" id="extend-options"></div>
+      </article>
+
+      <div class="results-grid results-feedback">
 
         <article class="card feedback feedback-good" aria-labelledby="good-title">
-          <h3 id="good-title" class="card-title">Co zrobiłeś dobrze</h3>
+          <h3 id="good-title" class="card-title">Co poszło dobrze</h3>
           <ul class="feedback-list" id="strengths"></ul>
         </article>
 
@@ -279,10 +366,27 @@
         </article>
       </div>
 
+      <article class="card reflection-card" aria-labelledby="reflection-title">
+        <h3 id="reflection-title" class="card-title">Wniosek na następną grę</h3>
+        <p class="lesson-check" id="lesson-check" hidden></p>
+        <fieldset>
+          <legend id="reflection-prompt">Co zrobisz inaczej w następnej grze?</legend>
+          <div class="reason-options reflection-options" id="reflection-options"></div>
+        </fieldset>
+        <p class="reflection-feedback" id="reflection-feedback" role="status" aria-live="polite"></p>
+        <p class="hint">Odpowiedź nie zmienia XP. Porównujemy ją z oceną, a w następnej grze sprawdzimy, czy wniosek został dotrzymany.</p>
+      </article>
+
       <article class="card" aria-labelledby="categories-title">
         <h3 id="categories-title" class="card-title">XP w kategoriach</h3>
         <p class="hint">Progi punktowe to reguły tej gry edukacyjnej, a nie uniwersalne zalecenia inwestycyjne.</p>
         <div class="categories" id="categories"></div>
+      </article>
+
+      <article class="card" aria-labelledby="compare-title">
+        <h3 id="compare-title" class="card-title">Porównanie strategii</h3>
+        <div class="compare-grid" id="compare-grid"></div>
+        <p class="hint">Te same ceny, inne decyzje. Porównanie pokazuje ryzyko i nie wpływa na XP. To nie jest rekomendacja.</p>
       </article>
 
       <details class="card journal-details">
@@ -330,11 +434,31 @@
         </section>
       </div>
     </section>
+    <section class="card glossary" id="slowniczek" aria-labelledby="glossary-title">
+      <h2 id="glossary-title" class="card-title-lg">Słowniczek</h2>
+      <p class="muted">Najważniejsze pojęcia z gry. Rozwiń hasło, żeby przeczytać wyjaśnienie.</p>
+      <div class="glossary-list">
+        <details><summary>Sesja</summary><p>Jeden dzień notowań na giełdzie (bez weekendów i świąt). W grze jedna sesja to jeden krok: poznajesz cenę z końca dnia.</p></details>
+        <details><summary>Cena spot</summary><p>Cena za natychmiastową dostawę towaru, np. baryłki ropy, w danym dniu. W grze używamy jej jako ceny aktywa.</p></details>
+        <details><summary>Pozycja i wielkość pozycji</summary><p>Pozycja to to, ile masz kupionego aktywa. Wielkość pozycji mówi, jaka część kapitału jest w nią zaangażowana — im większa, tym mocniej portfel reaguje na każdą zmianę ceny.</p></details>
+        <details><summary>Jednostka („jedn.”)</summary><p>Umowna „sztuka” aktywa w grze. Za kwotę zakupu dostajesz tyle jednostek, ile wynosi kwota podzielona przez cenę — także ułamek jednostki.</p></details>
+        <details><summary>Stop loss</summary><p>Ustalony z góry poziom ceny, po którego przekroczeniu sprzedajesz, żeby ograniczyć stratę. Nie gwarantuje ceny sprzedaży — przy gwałtownym spadku sprzedaż nastąpi niżej.</p></details>
+        <details><summary>Luka cenowa</summary><p>Sytuacja, w której cena „przeskakuje” poziom stop lossu, np. między sesjami. Dlatego w grze stop loss może sprzedać po cenie niższej niż ustawiony poziom.</p></details>
+        <details><summary>Uśrednianie w dół</summary><p>Dokupowanie aktywa, gdy jego cena spadła poniżej średniej ceny zakupu. Średnia cena spada, a razem z nią poziom stop lossu — możliwa strata rośnie ponad plan.</p></details>
+        <details><summary>Planowane ryzyko</summary><p>Ile stracisz, jeśli stop loss zadziała dokładnie na swoim poziomie: wartość pozycji × odległość do stop lossu. Bez stop lossu zagrożona jest cała pozycja.</p></details>
+        <details><summary>Obsunięcie kapitału</summary><p>Spadek wartości portfela od najwyższego dotychczasowego poziomu. Pokazuje, jak bolesne były najgorsze chwile rozgrywki.</p></details>
+        <details><summary>Dywersyfikacja</summary><p>Rozłożenie pieniędzy na różne aktywa, które nie zachowują się identycznie. Kilka zakupów tego samego aktywa to nie dywersyfikacja.</p></details>
+        <details><summary>Gotówka</summary><p>Też jest decyzją: nie traci, gdy ceny spadają, ale nie zyskuje, gdy rosną. W grze nie uwzględniamy inflacji ani odsetek.</p></details>
+        <details><summary>Kup i trzymaj</summary><p>Strategia polegająca na kupieniu aktywa i trzymaniu go bez względu na wahania cen. Na ekranie wyniku porównujemy ją z Twoimi decyzjami.</p></details>
+        <details><summary>OPEC+</summary><p>Porozumienie państw OPEC i innych producentów ropy, m.in. Rosji, które uzgadniają poziomy wydobycia. Ich decyzje mocno wpływają na cenę ropy.</p></details>
+        <details><summary>Losowy rynek</summary><p>Tryb, w którym ceny są losowe, ale zachowują typowe dzienne wahania ropy (ograniczone do ±6% dziennie). To nie są prawdziwe notowania. Ten sam numer losowania daje te same ceny.</p></details>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p><strong>Wehikuł Rynku</strong> — projekt edukacyjny. Nie zawiera rekomendacji ani linków do brokerów. <a href="privacy.html">Prywatność</a></p>
+      <p><strong>Wehikuł Rynku</strong> — projekt edukacyjny. Nie zawiera rekomendacji ani linków do brokerów. <a href="#slowniczek">Słowniczek</a> · <a href="privacy.html">Prywatność</a></p>
       <p id="data-attribution"></p>
       <p id="analytics-note"></p>
       <div id="analytics-debug" class="analytics-debug" hidden>
@@ -348,10 +472,21 @@
   <dialog id="course-dialog" class="dialog" aria-labelledby="course-dialog-title" aria-describedby="course-dialog-text">
     <div class="dialog-icon" aria-hidden="true">🎓</div>
     <h2 id="course-dialog-title" class="card-title-lg">Pełny kurs</h2>
-    <p id="course-dialog-text">Pełny kurs nie jest jeszcze gotowy. Nie pobieramy płatności. Dziękujemy za zainteresowanie.</p>
+    <p id="course-dialog-text">Pełny kurs nie jest jeszcze gotowy. Nie pobieramy płatności. Dziękujemy za zainteresowanie —
+      kliknięcie liczymy tylko jako zdarzenie „zainteresowanie kursem”, bez imienia, e-maila ani konta.</p>
     <form method="dialog">
       <button type="submit" class="btn btn-primary btn-block" autofocus>Zamknij</button>
     </form>
+  </dialog>
+
+  <!-- Potwierdzenie w oknie strony (zamiast window.confirm): przyciski mówią, co się stanie. -->
+  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <h2 id="confirm-title" class="card-title-lg"></h2>
+    <p id="confirm-text"></p>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-cancel" autofocus></button>
+      <button type="button" class="btn btn-primary" id="confirm-ok"></button>
+    </div>
   </dialog>
 </body>
 </html>

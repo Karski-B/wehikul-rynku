@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test ścieżki gracza</title>
+  <!-- Strona techniczna: klika aplikację w ramce (iframe) jak gracz i sprawdza efekty. -->
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.5; max-width: 72rem; margin: 0 auto; padding: 1rem; }
+    .layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+    li { margin-bottom: 0.25rem; }
+    .ok { color: #0a6b2d; }
+    .error { color: #b00020; font-weight: 700; }
+    iframe { border: 1px solid #999; background: #0b0f1a; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Test ścieżki gracza</h1>
+    <p>Test sam klika aplikację w ramce obok: plan, zlecenie z powodem, kolejne sesje, wynik, refleksja, odświeżenie i nowa gra.
+      Sprawdza też błędy w konsoli i poziome przewijanie przy 360 i 1280 px. Usuwa zapis bieżącej gry w tej karcie.</p>
+    <p id="summary" role="status">Uruchamianie…</p>
+    <div class="layout">
+      <ol id="results"></ol>
+      <iframe id="app" title="Aplikacja w teście" width="360" height="780"></iframe>
+    </div>
+  </main>
+  <script type="module" src="ui.js"></script>
+</body>
+</html>

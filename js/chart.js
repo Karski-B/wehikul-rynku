@@ -2,7 +2,7 @@
 // Dostaje WYŁĄCZNIE sesje już odsłonięte — przyszłych cen i dat tu nie ma.
 // Oś Y skaluje się tylko do widocznych danych, więc nie zdradza przyszłych minimów.
 
-import { formatMoney, formatShortDate } from './format.js';
+import { formatDate, formatMoney, formatMonthYear, formatShortDate } from './format.js';
 
 function cssVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -12,6 +12,7 @@ export function createPriceChart(canvas) {
   if (typeof window.Chart === 'undefined') return null;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let currentDates = []; // pełne daty do podpowiedzi (oś może pokazywać tylko miesiąc)
   const colors = {
     accent: cssVar('--accent'),
     gain: cssVar('--gain'),
@@ -89,6 +90,7 @@ export function createPriceChart(canvas) {
         tooltip: {
           filter: (item) => item.raw !== null,
           callbacks: {
+            title: (items) => (items.length > 0 ? formatDate(currentDates[items[0].dataIndex]) : ''),
             label: (item) => `${item.dataset.label}: ${formatMoney(item.parsed.y)}`,
           },
         },
@@ -111,12 +113,16 @@ export function createPriceChart(canvas) {
     // view: { dates, prices, stopPrice, buyIndexes: Set, sellIndexes: Set }
     update(view) {
       const [price, stop, buys, sells] = chart.data.datasets;
-      chart.data.labels = view.dates.map(formatShortDate);
+      // Przy długich okresach (ponad pół roku) oś pokazuje miesiąc i rok zamiast dnia.
+      const longRange = view.dates.length > 130;
+      currentDates = view.dates;
+      chart.data.labels = view.dates.map(longRange ? formatMonthYear : formatShortDate);
       price.data = view.prices;
       stop.data = view.stopPrice === null ? [] : view.prices.map(() => view.stopPrice);
       buys.data = view.prices.map((p, i) => (view.buyIndexes.has(i) ? p : null));
       sells.data = view.prices.map((p, i) => (view.sellIndexes.has(i) ? p : null));
-      chart.options.animation = reducedMotion.matches ? false : { duration: 400 };
+      // Bez animacji przy ograniczeniu ruchu w systemie i przy bardzo długich wykresach.
+      chart.options.animation = reducedMotion.matches || view.dates.length > 150 ? false : { duration: 400 };
       chart.update();
     },
   };

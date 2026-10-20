@@ -10,7 +10,7 @@ Plik wygenerowano skryptem [`tools/build_challenge_data.py`](tools/build_challen
 | | |
 |---|---|
 | Instrument | Ropa naftowa WTI, cena spot, Cushing (Oklahoma) |
-| Zakres | 3.02.2020–31.03.2020: 19 sesji historii + 22 sesje wyzwania (marzec) |
+| Zakres | 3.02.2020–14.10.2026: 1 676 sesji (19 sesji historii przed startem 28.02.2020) |
 | Wydawca danych | U.S. Energy Information Administration (EIA), agencja rządu USA |
 | Status prawny | Domena publiczna według oficjalnych warunków EIA (szczegóły i ryzyko poniżej) |
 | Użycie komercyjne | Według warunków EIA dozwolone; zalecane pisemne potwierdzenie przed sprzedażą kursu |
@@ -25,8 +25,8 @@ Plik wygenerowano skryptem [`tools/build_challenge_data.py`](tools/build_challen
   <https://www.eia.gov/dnav/pet/TblDefs/pet_pri_spt_tbldef2.asp>
   (w sekcji *Sources* EIA podaje: „Refinitiv, an LSEG business”).
 - **Data publikacji danych przez EIA:** 15.10.2026 (*Release Date* na stronie serii).
-- **Kontrola krzyżowa:** te same wartości w serii FRED `DCOILWTICO`
-  (<https://fred.stlouisfed.org/series/DCOILWTICO>). Wszystkie 41 wartości są identyczne.
+- **Kontrola krzyżowa:** wartości z lutego i marca 2020 r. porównano z serią FRED `DCOILWTICO`
+  (<https://fred.stlouisfed.org/series/DCOILWTICO>) — wszystkie 41 były identyczne.
   FRED oznacza tę serię tagiem **„Public Domain: Citation Requested”**.
 
 ## Licencja — właściwy fragment warunków
@@ -101,7 +101,11 @@ a co nie. Nie używamy logo EIA (jest zastrzeżonym znakiem towarowym).
   więc stop loss i zlecenia w grze są wykonywane w uproszczeniu.
 - Cena spot fizycznej ropy w Cushing nie jest instrumentem, który zwykły inwestor kupuje
   bezpośrednio. W grze to „aktywo edukacyjne”, a nie odwzorowanie konkretnego produktu.
-- **17.02.2020** nie ma notowania (dzień wolny na rynku w USA). Nie dopisaliśmy tej sesji.
+- W źródle brakuje 72 dni roboczych (dni wolne na rynku w USA, np. 17.02.2020). Nie dopisaliśmy tych sesji;
+  lista jest w pliku JSON (`timeline.missingWeekdays`).
+- **20.04.2020 cena była ujemna (−36,98 USD, czyli −82,49 zł symulacyjnych).** To prawdziwa wartość ze
+  źródła i nie została zmieniona. W grze kupno po cenie zerowej lub ujemnej jest niemożliwe, a sprzedaż
+  oznacza dopłatę.
 - EIA może korygować dane historyczne. Wartości odpowiadają publikacji z 15.10.2026.
 - Plik JSON jest publiczny, więc dociekliwy użytkownik może podejrzeć przyszłe ceny
   w narzędziach przeglądarki. Interfejs ich nie pokazuje.
@@ -127,3 +131,36 @@ dywersyfikacji między aktywami.
 2. Albo użyć scenariusza **ilustracyjnego** (wygenerowanego), wyraźnie oznaczonego w interfejsie
    jako „dane przykładowe, nie historyczne”. Takich danych nie wolno przedstawiać jako
    prawdziwych.
+
+## Długość wyzwania
+
+Plik zawiera warianty długości (`timeline.horizons`): marzec 2020 (22 sesje), do końca czerwca 2020,
+cały 2020 r. i „bez limitu” (do najnowszej sesji w danych). Po ukończeniu wyzwanie można przedłużyć.
+Przy odświeżaniu danych skrypt sam dołącza nowe sesje opublikowane przez EIA.
+
+## Wiadomości z rynku
+
+Pole `marketEvents` zawiera krótkie opisy 16 ważnych wydarzeń z lat 2020–2025 (np. ogłoszenie pandemii
+przez WHO, ujemna cena ropy, inwazja Rosji na Ukrainę, decyzje OPEC+, cła w USA, konflikt Izraela z Iranem).
+To **opracowanie własne** autorów aplikacji na podstawie powszechnie znanych faktów — nie są to dane EIA
+ani cytaty z mediów. Gra pokazuje każdą wiadomość dopiero po dojściu do jej daty.
+
+Data wiadomości to **pierwsza sesja, w której rynek mógł na nią zareagować** (np. decyzja ogłoszona
+w niedzielę → poniedziałek). Przy dodawaniu wiadomości sprawdzamy w danych, że data jest sesją
+z notowaniem (dlatego pominęliśmy 9.10.2023 — tego dnia w serii EIA nie ma notowania). Opisy są
+neutralne: mówią, co się stało, a nie co kupić. Lista jest w `tools/build_challenge_data.py`
+(`MARKET_EVENTS`), a skrypt sprawdza, czy każda data jest sesją.
+
+## Tryb „Losowy rynek”
+
+W tym trybie ceny **nie są historyczne** i interfejs zawsze to zaznacza („ceny losowe”, fikcyjny
+„Surowiec X”, fikcyjny kalendarz od 2030 r.). Sposób tworzenia (`js/random-market.js`):
+
+1. Dzienne zmiany logarytmiczne ceny ropy WTI z tego samego pliku EIA (2020–2026, bez dnia z ceną ujemną).
+2. Odjęcie średniej zmiany — rynek nie ma z góry ustalonego trendu.
+3. Losowanie zmian blokami po 5 sesji (zachowuje przeplatanie spokojnych i nerwowych okresów).
+4. Ograniczenie każdej dziennej zmiany do ±6%.
+5. Ten sam numer losowania (seed) daje zawsze te same ceny; `?seed=123456` w adresie odtwarza grę.
+
+Licencja: ceny są wygenerowane przez aplikację; wykorzystują tylko statystyczny rozkład zmian z danych EIA
+(domena publiczna), więc obowiązują te same warunki i oznaczenie źródła.

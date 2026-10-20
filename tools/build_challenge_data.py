@@ -5,9 +5,10 @@ Uruchomienie (w głównym folderze projektu):
 
 Skrypt:
 1. pobiera publiczną stronę EIA z dziennymi cenami spot ropy WTI (seria RWTC),
-2. wybiera sesje od 3 lutego do 31 marca 2020 r.,
+2. wybiera sesje od 3 lutego 2020 r. do najnowszej opublikowanej sesji,
 3. przelicza ceny w USD na umowną cenę symulacyjną w zł (28.02.2020 = 100 zł),
-4. sprawdza poprawność dat i zapisuje JSON.
+4. dodaje warianty długości wyzwania i opisy ważnych wydarzeń rynkowych,
+5. sprawdza poprawność dat i zapisuje JSON.
 
 Nie wymaga kluczy API ani dodatkowych pakietów.
 """
@@ -22,7 +23,59 @@ from pathlib import Path
 SOURCE_URL = "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RWTC&f=D"
 HISTORY_START = datetime.date(2020, 2, 3)   # pierwsza sesja widoczna na starcie
 START_DATE = datetime.date(2020, 2, 28)     # ostatnia sesja znana przed wyzwaniem
-END_DATE = datetime.date(2020, 3, 31)       # ostatnia sesja wyzwania
+# Warianty długości wyzwania: (id, nazwa, ostatni dzień). None = najnowsze dane EIA.
+HORIZONS = [
+    ("march-2020", "Marzec 2020", datetime.date(2020, 3, 31)),
+    ("q2-2020", "Do końca czerwca 2020", datetime.date(2020, 6, 30)),
+    ("year-2020", "Cały rok 2020", datetime.date(2020, 12, 31)),
+    ("all", "Bez limitu — do najnowszych danych", None),
+]
+DEFAULT_HORIZON = "march-2020"
+# Wydarzenia pokazywane w grze dopiero, gdy gracz dojdzie do danej sesji.
+# Opisy: opracowanie własne autorów aplikacji (fakty powszechnie znane), nie pochodzą z EIA.
+MARKET_EVENTS = [
+    ("2020-03-06", "OPEC+ bez porozumienia",
+     "Rozmowy państw OPEC i Rosji (OPEC+) w Wiedniu zakończyły się bez zgody na dalsze ograniczenie wydobycia ropy."),
+    ("2020-03-09", "Początek wojny cenowej",
+     "W weekend Arabia Saudyjska zapowiedziała obniżki cen i zwiększenie wydobycia. Na otwarciu tygodnia ceny ropy gwałtownie spadają."),
+    ("2020-03-11", "WHO ogłasza pandemię",
+     "Światowa Organizacja Zdrowia uznała COVID-19 za pandemię. Ograniczenia podróży i działalności gospodarczej zmniejszają popyt na paliwa."),
+    ("2020-04-13", "Rekordowe cięcia OPEC+",
+     "12 kwietnia państwa OPEC+ uzgodniły rekordowe ograniczenie wydobycia — ok. 9,7 mln baryłek dziennie od maja."),
+    ("2020-04-20", "Cena ropy poniżej zera",
+     "Cena ropy WTI spadła poniżej zera. Dzień przed wygaśnięciem majowego kontraktu terminowego magazyny w Cushing "
+     "były prawie pełne, więc posiadacze tych kontraktów płacili, żeby nie musieć odebrać ropy. Przy kontraktach "
+     "terminowych można stracić więcej, niż się wpłaciło. W grze cena symulacyjna też jest ujemna — posiadane "
+     "jednostki obniżają wartość portfela, a kupno jest niemożliwe."),
+    ("2020-11-09", "Wiadomość o szczepionce",
+     "Pfizer i BioNTech ogłosili wysoką skuteczność szczepionki na COVID-19. Rynki zareagowały optymizmem co do powrotu popytu."),
+    ("2022-02-24", "Inwazja Rosji na Ukrainę",
+     "Rosja rozpoczęła pełnoskalową inwazję na Ukrainę. Rośnie niepewność co do dostaw surowców energetycznych."),
+    ("2022-03-08", "USA zakazują importu rosyjskiej ropy",
+     "Prezydent USA ogłosił zakaz importu rosyjskiej ropy do Stanów Zjednoczonych."),
+    ("2022-03-31", "USA uwalniają rezerwy ropy",
+     "USA zapowiedziały uwalnianie ok. 1 mln baryłek ropy dziennie z rezerw strategicznych przez pół roku, żeby obniżyć ceny paliw."),
+    ("2022-10-05", "OPEC+ tnie wydobycie o 2 mln baryłek",
+     "Państwa OPEC+ uzgodniły obniżenie docelowego wydobycia o 2 mln baryłek dziennie od listopada 2022 r."),
+    ("2023-04-03", "Niespodziewane cięcia OPEC+",
+     "W niedzielę Arabia Saudyjska i kilka innych państw OPEC+ zapowiedziały dobrowolne ograniczenie wydobycia, "
+     "łącznie o ok. 1,2 mln baryłek dziennie."),
+    ("2023-06-05", "Dodatkowe cięcie Arabii Saudyjskiej",
+     "Arabia Saudyjska zapowiedziała w weekend dodatkowe dobrowolne ograniczenie wydobycia o 1 mln baryłek dziennie od lipca. "
+     "Tym razem cena zmieniła się niewiele — nie każda ważna wiadomość mocno porusza rynkiem."),
+    ("2024-06-03", "OPEC+ zapowiada wycofywanie cięć",
+     "OPEC+ przedłużył ograniczenia wydobycia na 2025 r., ale zapowiedział stopniowe wycofywanie części dobrowolnych cięć "
+     "od jesieni 2024 r."),
+    ("2025-04-03", "Cła w USA i decyzja OPEC+",
+     "Po ogłoszeniu przez USA szerokich ceł importowych rynek obawiał się spowolnienia gospodarki. Tego samego dnia "
+     "część państw OPEC+ zapowiedziała szybsze zwiększanie wydobycia."),
+    ("2025-06-13", "Atak Izraela na Iran",
+     "Izrael przeprowadził ataki na cele w Iranie. Rynek obawiał się zakłóceń dostaw ropy z Bliskiego Wschodu."),
+    ("2025-06-23", "Ograniczony odwet Iranu",
+     "W weekend USA zaatakowały irańskie obiekty jądrowe. Iran odpowiedział w ograniczony sposób, "
+     "a wieczorem ogłoszono rozejm między Izraelem a Iranem. "
+     "Rynek uznał, że ryzyko przerw w dostawach maleje."),
+]
 BASE_PRICE = 100.0                          # cena symulacyjna w dniu START_DATE
 OUTPUT = Path(__file__).resolve().parent.parent / "data" / "challenge-march-2020.json"
 MONTHS = {m: i for i, m in enumerate(
@@ -58,22 +111,33 @@ def main():
     assert release, "Nie znaleziono daty publikacji (Release Date) na stronie EIA"
     release_date = datetime.datetime.strptime(release[1], "%m/%d/%Y").date()
     all_values = parse_daily_values(page)
-    selected = [(d, v) for d, v in all_values if HISTORY_START <= d <= END_DATE]
-    selected.sort()
+    selected = sorted((d, v) for d, v in all_values if d >= HISTORY_START)
+    end_date = selected[-1][0]
 
     # Kontrola poprawności: rosnące, unikalne daty i brak weekendów
     dates = [d for d, _ in selected]
     assert dates == sorted(set(dates)), "Daty muszą być unikalne i rosnące"
     assert all(d.weekday() < 5 for d in dates), "W danych nie może być weekendów"
-    assert START_DATE in dates and END_DATE in dates, "Brakuje daty startu lub końca"
+    assert START_DATE in dates, "Brakuje daty startu"
+    assert all(date in {d.isoformat() for d in dates} for date, _, _ in MARKET_EVENTS), "Wydarzenie poza sesją"
 
     # Dni robocze bez notowania w źródle (np. święta w USA) - tylko do dokumentacji
     missing = []
     day = HISTORY_START
-    while day <= END_DATE:
+    while day <= end_date:
         if day.weekday() < 5 and day not in dates:
             missing.append(day.isoformat())
         day += datetime.timedelta(days=1)
+
+    horizons = []
+    for horizon_id, label, target in HORIZONS:
+        last = max(d for d in dates if d <= (target or end_date))
+        horizons.append({
+            "id": horizon_id,
+            "label": label,
+            "endDate": last.isoformat(),
+            "sessions": sum(1 for d in dates if START_DATE < d <= last),
+        })
 
     base_close = dict(selected)[START_DATE]
     sessions = [{
@@ -83,7 +147,7 @@ def main():
     } for d, v in selected]
 
     challenge = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "id": "march-2020",
         "title": "Marzec 2020: Przetrwaj krach",
         "goal": "Masz 10 000 zł wirtualnych. Przetrwaj krach i nie strać więcej niż 10% kapitału początkowego.",
@@ -99,9 +163,12 @@ def main():
         "timeline": {
             "historyStart": HISTORY_START.isoformat(),
             "startDate": START_DATE.isoformat(),
-            "endDate": END_DATE.isoformat(),
+            "endDate": end_date.isoformat(),
             "note": ("Sesje do startDate włącznie są widoczne od początku. Sesje po startDate "
-                     "odsłaniane są pojedynczo w trakcie wyzwania."),
+                     "odsłaniane są pojedynczo w trakcie wyzwania. Gracz wybiera długość wyzwania "
+                     "(horizons) i może ją później przedłużyć — najdalej do endDate."),
+            "defaultHorizon": DEFAULT_HORIZON,
+            "horizons": horizons,
             "missingWeekdays": [{
                 "date": d,
                 "reason": "Brak notowania w źródle EIA (dzień wolny na rynku USA).",
@@ -130,9 +197,15 @@ def main():
                 "fxIncluded": False,
                 "fxNote": ("Przeliczenie nie uwzględnia kursu USD/PLN ani kosztów transakcyjnych. "
                            "Polski inwestor miałby dodatkowo zysk lub stratę na walucie."),
+                "negativePrices": [s for s in [{"date": d.isoformat(), "close": v} for d, v in selected] if s["close"] <= 0],
+                "negativePriceNote": ("Ujemne ceny są prawdziwymi wartościami ze źródła i nie zostały zmienione. "
+                                      "W grze nie można kupić po cenie zerowej lub ujemnej."),
             },
             "sessions": sessions,
         }],
+        "marketEvents": [{"date": d, "title": title, "text": text} for d, title, text in MARKET_EVENTS],
+        "marketEventsSource": ("Opisy wydarzeń: opracowanie własne autorów aplikacji na podstawie powszechnie "
+                               "znanych faktów. Nie są częścią danych EIA."),
         "diversification": {
             "multiAssetAvailable": False,
             "note": ("W tym wyzwaniu jest tylko jedno aktywo (ropa WTI) oraz gotówka. Aplikacja nie "
@@ -155,10 +228,25 @@ def main():
     }
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(challenge, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    march = [s for s in sessions if s["date"] > START_DATE.isoformat()]
-    print(f"Zapisano {OUTPUT.name}: {len(sessions)} sesji, w tym {len(march)} sesji wyzwania.")
-    print(f"Dni robocze bez notowania: {missing or 'brak'}")
+    OUTPUT.write_text(to_readable_json(challenge), encoding="utf-8")
+    print(f"Zapisano {OUTPUT.name}: {len(sessions)} sesji ({HISTORY_START} – {end_date}).")
+    for h in horizons:
+        print(f"  {h['label']}: {h['sessions']} sesji, do {h['endDate']}")
+    print(f"Dni robocze bez notowania: {len(missing)}")
+    print(f"Ceny ujemne: {[(d.isoformat(), v) for d, v in selected if v <= 0] or 'brak'}")
+
+
+def to_readable_json(challenge):
+    """JSON z wcięciami, ale z jedną sesją na linię (plik jest wtedy krótszy i czytelny)."""
+    sessions = challenge["assets"][0]["sessions"]
+    placeholder = {**challenge, "calendar": "@CALENDAR@",
+                   "assets": [{**challenge["assets"][0], "sessions": "@SESSIONS@"}]}
+    text = json.dumps(placeholder, ensure_ascii=False, indent=2)
+    calendar = "[\n" + ",\n".join(f'    "{d}"' for d in challenge["calendar"]) + "\n  ]"
+    rows = "[\n" + ",\n".join("        " + json.dumps(s, ensure_ascii=False) for s in sessions) + "\n      ]"
+    text = text.replace('"@CALENDAR@"', calendar).replace('"@SESSIONS@"', rows)
+    json.loads(text)  # kontrola: wynik nadal jest poprawnym JSON-em
+    return text + "\n"
 
 
 if __name__ == "__main__":

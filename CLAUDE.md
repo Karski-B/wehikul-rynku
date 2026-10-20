@@ -42,7 +42,7 @@ js/scoring.js          ocena procesu i XP (bez DOM)
 js/*.js                pozostałe moduły (dane, wykres, analityka, formularz, konfiguracja)
 api/subscribe.js       jedyna funkcja serwerowa (Vercel) — zapis e-mail do Brevo
 data/*.json            dane historyczne; tools/ — skrypt, który je tworzy
-tests/                 testy w przeglądarce (tests/index.html)
+tests/                 testy w przeglądarce (tests/index.html — obliczenia, tests/ui.html — ścieżka gracza)
 ```
 
 Pełny opis: README.md. Nowe foldery tworzymy dopiero, gdy są potrzebne.
@@ -64,6 +64,8 @@ Pełny opis: README.md. Nowe foldery tworzymy dopiero, gdy są potrzebne.
    w `DATA_SOURCE.md`: źródło (URL), data sprawdzenia, licencja lub warunki ponownego
    wykorzystania, wymagane oznaczenie źródła, opis przeliczeń i ograniczeń. Bez jasnej
    licencji — nie używamy danych. Ceny przeliczone oznaczamy jako „symulacyjne”.
+   Wyjątek: tryb „Losowy rynek” — ceny wygenerowane, zawsze wyraźnie oznaczone jako losowe
+   (fikcyjny surowiec i kalendarz); nigdy nie przedstawiamy ich jako prawdziwych notowań.
 5. **Sekrety nigdy w kodzie przeglądarki ani w publicznym repozytorium.** Żadnych kluczy
    API, tokenów ani haseł w `.html`, `.css`, `js/`, `.json`. Repozytorium jest publiczne
    (GitHub Pages). Jeśli kiedyś potrzebny będzie klucz, trafia tylko do zmiennych środowiskowych
@@ -139,3 +141,4 @@ Następnie otwórz <http://localhost:8000>. Zatrzymanie serwera: `Ctrl + C`.
 
 Testy obliczeń: <http://localhost:8000/tests/> — po każdej zmianie w `js/simulation.js`,
 `js/scoring.js` lub `api/subscribe.js` wszystkie testy muszą przechodzić.
+Test ścieżki gracza: <http://localhost:8000/tests/ui.html> — po zmianach w HTML, CSS lub `js/main.js`/`js/render.js`.

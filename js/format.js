@@ -35,3 +35,33 @@ export function formatDate(isoDate) {
 export function formatShortDate(isoDate) {
   return shortDate.format(new Date(`${isoDate}T00:00:00Z`));
 }
+
+const monthYear = new Intl.DateTimeFormat('pl-PL', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+// Krótki zapis miesiąca i roku, np. „kwi 2020” — do osi wykresu przy długich okresach.
+export function formatMonthYear(isoDate) {
+  return monthYear.format(new Date(`${isoDate}T00:00:00Z`));
+}
+
+// Polska odmiana: 1 sesja, 2–4 sesje (bez 12–14), 5+ sesji.
+export function formatSessions(count) {
+  const lastDigit = count % 10;
+  const lastTwo = count % 100;
+  let word = 'sesji';
+  if (count === 1) word = 'sesja';
+  else if (lastDigit >= 2 && lastDigit <= 4 && (lastTwo < 12 || lastTwo > 14)) word = 'sesje';
+  return `${count} ${word}`;
+}
+
+const weekdayShort = new Intl.DateTimeFormat('pl-PL', { weekday: 'short', timeZone: 'UTC' });
+const compactDate = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+// Dzień tygodnia, np. „pt.” — do pulpitu czasu.
+export function formatWeekday(isoDate) {
+  return weekdayShort.format(new Date(`${isoDate}T00:00:00Z`));
+}
+
+// Data z krótkim miesiącem, np. „6 mar 2020”.
+export function formatCompactDate(isoDate) {
+  return compactDate.format(new Date(`${isoDate}T00:00:00Z`));
+}

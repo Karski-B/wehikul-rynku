@@ -35,9 +35,17 @@ export function validateChallenge(challenge) {
     if (i > 0 && date <= calendar[i - 1]) errors.push(`Daty nie rosną: ${calendar[i - 1]} → ${date}.`);
   });
 
-  const { startDate, endDate } = challenge.timeline ?? {};
+  const { startDate, endDate, horizons, defaultHorizon } = challenge.timeline ?? {};
   if (!calendar.includes(startDate)) errors.push('Data startu nie jest w kalendarzu.');
   if (!calendar.includes(endDate)) errors.push('Data końca nie jest w kalendarzu.');
+  if (!Array.isArray(horizons) || horizons.length === 0) {
+    errors.push('Brak wariantów długości wyzwania.');
+  } else {
+    horizons.forEach((h) => {
+      if (!calendar.includes(h.endDate) || h.endDate <= startDate) errors.push(`Zły koniec wariantu ${h.id}.`);
+    });
+    if (!horizons.some((h) => h.id === defaultHorizon)) errors.push('Brak domyślnego wariantu długości.');
+  }
 
   if (!Array.isArray(challenge.assets) || challenge.assets.length === 0) {
     errors.push('Brak aktywów.');
@@ -52,7 +60,8 @@ export function validateChallenge(challenge) {
     }
     sessions.forEach((session, i) => {
       if (session.date !== calendar[i]) errors.push(`Aktywo ${asset.id}: data ${session.date} nie pasuje do kalendarza.`);
-      if (!Number.isFinite(session.price) || session.price <= 0) errors.push(`Aktywo ${asset.id}: zła cena w dniu ${session.date}.`);
+      // Cena może być ujemna (np. ropa WTI 20.04.2020), ale musi być liczbą.
+      if (!Number.isFinite(session.price)) errors.push(`Aktywo ${asset.id}: zła cena w dniu ${session.date}.`);
     });
   });
 
